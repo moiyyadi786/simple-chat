@@ -1,0 +1,35 @@
+version: "3"
+services:
+  #Nginx Service
+  webserver:
+    image: nginx
+    container_name: webserver
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "8080:80"
+    depends_on:
+      - gatherly
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./static/index.html:/etc/static/index.html
+  #redis
+  redis:
+    image: redis
+    command: redis-server --appendonly yes
+    container_name: gatherly_redis
+    ports:
+      - 6379:6379
+  #application
+  gatherly:
+    build: .
+    ports:
+      - "3000"
+    environment:
+      # Tell node to look for node modules in the directory you installed them during the build.
+      - NODE_PATH=/usr/app/node_modules
+      - PORT=3000
+    volumes:
+      - ./:/usr/app
+
+
